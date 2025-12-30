@@ -342,6 +342,41 @@ nav a:hover {
     font-size: 1.2rem;
 }
 
+/* Moderation Notice */
+.moderation-notice {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 40px;
+    text-align: center;
+}
+
+.moderation-notice p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.moderation-notice a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.moderation-notice a:hover {
+    color: var(--secondary);
+}
+
+.moderation-notice code {
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: var(--error);
+    font-size: 0.9rem;
+}
+
 /* Footer */
 footer {
     text-align: center;
@@ -356,6 +391,88 @@ footer {
     margin-top: 10px;
     color: var(--text-muted);
     opacity: 0.7;
+}
+
+.developer-credit {
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.developer-credit p {
+    margin: 8px 0;
+}
+
+.developer-name {
+    position: relative;
+    display: inline-block;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.developer-name:hover {
+    color: var(--secondary);
+}
+
+.developer-card {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: var(--bg);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 280px;
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.developer-name:hover .developer-card {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-20px);
+}
+
+.card-content {
+    font-family: 'Courier New', monospace;
+    color: var(--success);
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+.terminal-line {
+    margin: 4px 0;
+}
+
+.terminal-line:first-child {
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.social-link a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.social-link a:hover {
+    color: var(--secondary);
+}
+
+.social-link a::before {
+    content: "📷";
+    font-size: 1rem;
 }
 
 .about-duet {
@@ -400,5 +517,17 @@ footer {
 
     .confessions-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .developer-card {
+        left: 0;
+        right: 0;
+        transform: translateX(0) translateY(-10px);
+        margin: 0 20px;
+        min-width: auto;
+    }
+    
+    .developer-name:hover .developer-card {
+        transform: translateX(0) translateY(-20px);
     }
 }
