@@ -15,6 +15,8 @@
     --border: #334155;
     --success: #10b981;
     --error: #ef4444;
+    --warning: #f59e0b;
+    --star-color: #fbbf24;
 }
 
 body {
@@ -73,25 +75,28 @@ header h1 a {
 .subtitle {
     color: var(--text-muted);
     font-size: 0.95rem;
+    margin-bottom: 20px;
 }
 
 nav {
-    margin-top: 20px;
     display: flex;
-    gap: 20px;
+    gap: 10px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 nav a {
     color: var(--text);
     text-decoration: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 8px;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    border: 1px solid transparent;
 }
 
-nav a:hover {
+nav a:hover, nav a.active {
     background: var(--bg-card);
+    border-color: var(--primary);
 }
 
 /* Hero Section */
@@ -109,6 +114,52 @@ nav a:hover {
     font-size: 1.2rem;
     color: var(--text-muted);
     margin-bottom: 40px;
+}
+
+/* Feature Cards on Home Page */
+.feature-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.feature-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text);
+}
+
+.feature-card p {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    line-height: 1.7;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* Buttons */
@@ -139,6 +190,12 @@ nav a:hover {
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-secondary {
@@ -208,6 +265,14 @@ nav a:hover {
     color: var(--text);
     font-size: 1rem;
     font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
 }
 
 .form-group textarea {
@@ -219,6 +284,50 @@ nav a:hover {
     text-align: right;
     font-size: 0.9rem;
     color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.form-notice {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warning);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.form-notice p {
+    color: var(--warning);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Star Rating */
+.star-rating {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.star {
+    font-size: 2.5rem;
+    color: var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.star:hover {
+    transform: scale(1.2);
+}
+
+.star.active {
+    color: var(--star-color);
+}
+
+.rating-text {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.95rem;
     margin-top: 4px;
 }
 
@@ -324,8 +433,204 @@ nav a:hover {
     padding: 4px 8px;
 }
 
-.like-btn:hover {
-    color: var(--primary);
+.like-btn:hover:not(:disabled) {
+    color: #ec4899;
+}
+
+.like-btn:disabled {
+    cursor: not-allowed;
+}
+
+/* Teacher Ratings */
+.ratings-header {
+    margin-bottom: 30px;
+}
+
+.ratings-header h2 {
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.filter-select {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.ratings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.teacher-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.teacher-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.teacher-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.teacher-info {
+    flex: 1;
+}
+
+.teacher-name {
+    font-size: 1.8rem;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.teacher-department {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--primary);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.teacher-rating {
+    text-align: right;
+}
+
+.average-rating {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--star-color);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stars-display {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+    justify-content: flex-end;
+}
+
+.stars-display .star {
+    font-size: 1.3rem;
+}
+
+.stars-display .star.filled {
+    color: var(--star-color);
+}
+
+.stars-display .star.half-filled {
+    color: var(--star-color);
+    opacity: 0.5;
+}
+
+.stars-display .star.empty {
+    color: var(--border);
+}
+
+.rating-count {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.ratings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.individual-rating {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.rating-date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.rating-review {
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.rating-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.helpful-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.helpful-btn:hover:not(:disabled) {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.helpful-btn:disabled {
+    cursor: not-allowed;
+}
+
+.helpful-btn.marked-helpful {
+    border-color: var(--success);
+    color: var(--success);
 }
 
 .loading {
@@ -335,7 +640,8 @@ nav a:hover {
     font-size: 1.2rem;
 }
 
-.no-confessions {
+.no-confessions,
+.no-ratings {
     text-align: center;
     padding: 60px;
     color: var(--text-muted);
@@ -519,6 +825,23 @@ footer {
         grid-template-columns: 1fr;
     }
     
+    .feature-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .teacher-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .teacher-rating {
+        text-align: left;
+    }
+    
+    .stars-display {
+        justify-content: flex-start;
+    }
+    
     .developer-card {
         left: 0;
         right: 0;
@@ -529,5 +852,40 @@ footer {
     
     .developer-name:hover .developer-card {
         transform: translateX(0) translateY(-20px);
+    }
+    
+    .filters {
+        flex-direction: column;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    nav {
+        gap: 8px;
+    }
+    
+    nav a {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+    }
+    
+    .teacher-name {
+        font-size: 1.4rem;
+    }
+    
+    .average-rating {
+        font-size: 2rem;
     }
 }
