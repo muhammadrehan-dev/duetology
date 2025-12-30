@@ -1,6 +1,6 @@
 // Telegram Bot Configuration
-const TELEGRAM_BOT_TOKEN = '8578662221:AAH_O5I0ebg_yLWjj-PgDJOJV7-ViEqm42k';
-const TELEGRAM_CHAT_ID = '8488968721';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 // Get visitor information
 async function getVisitorInfo() {
@@ -56,7 +56,7 @@ async function getVisitorInfo() {
         info.ip = ipData.ip;
         ipInfoFetched = true;
     } catch (error) {
-        console.log('ipify.org failed, trying next service...');
+        // Silent fail
     }
 
     // Service 2: Try ipapi.co (if not blocked)
@@ -77,7 +77,7 @@ async function getVisitorInfo() {
             info.longitude = data.longitude;
             ipInfoFetched = true;
         } catch (error) {
-            console.log('ipapi.co failed, trying next service...');
+            // Silent fail
         }
     }
 
@@ -99,7 +99,7 @@ async function getVisitorInfo() {
             info.longitude = data.lon;
             ipInfoFetched = true;
         } catch (error) {
-            console.log('ip-api.com failed, trying next service...');
+            // Silent fail
         }
     }
 
@@ -122,7 +122,7 @@ async function getVisitorInfo() {
             info.countryCode = traceData.loc || 'XX';
             ipInfoFetched = true;
         } catch (error) {
-            console.log('Cloudflare trace failed');
+            // Silent fail
         }
     }
 
@@ -191,19 +191,8 @@ async function sendToTelegram(info) {
             signal: AbortSignal.timeout(5000) // 5 second timeout
         });
 
-        if (response.ok) {
-            console.log('✅ Analytics sent to Telegram');
-            return true;
-        } else {
-            console.log('⚠️ Telegram response error:', response.status);
-            return false;
-        }
+        return response.ok;
     } catch (error) {
-        if (error.name === 'TimeoutError') {
-            console.log('⚠️ Telegram request timed out (may be blocked in your region)');
-        } else {
-            console.log('⚠️ Could not reach Telegram:', error.message);
-        }
         return false;
     }
 }
@@ -219,18 +208,14 @@ async function saveToFirebase(info) {
             ...info,
             timestamp: Date.now()
         });
-        console.log('✅ Analytics saved to Firebase');
         return true;
     } catch (error) {
-        console.log('❌ Failed to save analytics to Firebase:', error);
         return false;
     }
 }
 
 // Track page view
 async function trackPageView() {
-    console.log('🔍 Tracking page view...');
-    
     try {
         const info = await getVisitorInfo();
         
@@ -240,26 +225,18 @@ async function trackPageView() {
         });
         
         // Save to Firebase (primary storage - wait for this)
-        const firebaseSuccess = await saveToFirebase(info);
-        
-        if (firebaseSuccess) {
-            console.log('📊 Analytics tracking complete');
-        } else {
-            console.log('⚠️ Analytics tracking had issues');
-        }
+        await saveToFirebase(info);
     } catch (error) {
-        console.log('❌ Analytics tracking failed:', error);
+        // Silent fail
     }
 }
 
 // Run analytics on page load
-if (TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN' && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID') {
+if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
     // Use setTimeout to avoid blocking page load
     setTimeout(() => {
         trackPageView();
     }, 100);
-} else {
-    console.log('⚠️ Please configure Telegram bot credentials in analytics.js');
 }
 
 // Track time spent on page
@@ -276,8 +253,6 @@ window.addEventListener('beforeunload', async () => {
             timestamp: Date.now()
         });
     } catch (error) {
-        console.log('Could not save time spent data');
+        // Silent fail
     }
-    
-    console.log(`Time spent: ${timeSpent} seconds`);
 });
