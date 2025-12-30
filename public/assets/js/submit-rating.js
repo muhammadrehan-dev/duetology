@@ -1,5 +1,5 @@
 import { database } from './firebase-config.js';
-import { ref, push, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { ref, push, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 // Get form elements
 const form = document.getElementById('ratingForm');
@@ -11,6 +11,12 @@ const submitBtn = document.getElementById('submitBtn');
 const messageDiv = document.getElementById('message');
 const ratingValue = document.getElementById('ratingValue');
 const ratingText = document.getElementById('ratingText');
+const teacherSuggestions = document.getElementById('teacherSuggestions');
+const quickSelectGrid = document.getElementById('quickSelectGrid');
+const existingTeachersSection = document.getElementById('existingTeachersSection');
+
+let allRatings = [];
+let teachersList = [];
 
 // Star rating functionality
 const stars = document.querySelectorAll('.star');
@@ -80,6 +86,157 @@ function showMessage(text, type) {
     setTimeout(() => {
         messageDiv.classList.add('hidden');
     }, 5000);
+}
+
+// Calculate teacher statistics
+function calculateTeacherStats() {
+    const stats = {};
+    
+    allRatings.forEach(rating => {
+        const key = `${rating.teacherName}_${rating.department}`;
+        
+        if (!stats[key]) {
+            stats[key] = {
+                teacherName: rating.teacherName,
+                department: rating.department,
+                totalRatings: 0,
+                totalStars: 0
+            };
+        }
+        
+        stats[key].totalRatings++;
+        stats[key].totalStars += rating.stars;
+    });
+    
+    // Convert to array
+    teachersList = Object.values(stats).map(stat => ({
+        ...stat,
+        averageRating: (stat.totalStars / stat.totalRatings).toFixed(1)
+    }));
+    
+    // Sort by average rating (highest first)
+    teachersList.sort((a, b) => b.averageRating - a.averageRating);
+}
+
+// Display quick select teachers
+function displayQuickSelect() {
+    if (teachersList.length === 0) {
+        existingTeachersSection.style.display = 'none';
+        return;
+    }
+    
+    existingTeachersSection.style.display = 'block';
+    quickSelectGrid.innerHTML = '';
+    
+    teachersList.forEach(teacher => {
+        const card = document.createElement('div');
+        card.className = 'teacher-quick-select';
+        card.innerHTML = `
+            <span class="quick-select-name">${escapeHtml(teacher.teacherName)}</span>
+            <div class="quick-select-info">
+                <span class="quick-select-dept">${escapeHtml(teacher.department)}</span>
+                <span class="quick-select-rating">⭐ ${teacher.averageRating}</span>
+            </div>
+        `;
+        
+        card.addEventListener('click', () => {
+            selectTeacher(teacher.teacherName, teacher.department);
+        });
+        
+        quickSelectGrid.appendChild(card);
+    });
+}
+
+// Select teacher from quick select
+function selectTeacher(name, dept) {
+    teacherNameInput.value = name;
+    departmentInput.value = dept;
+    
+    // Visual feedback
+    document.querySelectorAll('.teacher-quick-select').forEach(card => {
+        card.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Scroll to form
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Focus on rating
+    document.getElementById('starRating').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Autocomplete suggestions
+teacherNameInput.addEventListener('input', () => {
+    const searchTerm = teacherNameInput.value.trim().toLowerCase();
+    
+    if (searchTerm.length < 2) {
+        teacherSuggestions.classList.remove('show');
+        return;
+    }
+    
+    const matches = teachersList.filter(teacher => 
+        teacher.teacherName.toLowerCase().includes(searchTerm)
+    );
+    
+    if (matches.length === 0) {
+        teacherSuggestions.innerHTML = '<div class="no-suggestions">No matching teachers. Enter a new name.</div>';
+        teacherSuggestions.classList.add('show');
+        return;
+    }
+    
+    teacherSuggestions.innerHTML = matches.map(teacher => `
+        <div class="suggestion-item" data-name="${escapeHtml(teacher.teacherName)}" data-dept="${escapeHtml(teacher.department)}">
+            <span class="suggestion-name">${escapeHtml(teacher.teacherName)}</span>
+            <div class="suggestion-dept">
+                <span>${escapeHtml(teacher.department)}</span>
+                <span class="suggestion-rating">⭐ ${teacher.averageRating} (${teacher.totalRatings} reviews)</span>
+            </div>
+        </div>
+    `).join('');
+    
+    teacherSuggestions.classList.add('show');
+    
+    // Add click listeners to suggestions
+    document.querySelectorAll('.suggestion-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const name = item.dataset.name;
+            const dept = item.dataset.dept;
+            teacherNameInput.value = name;
+            departmentInput.value = dept;
+            teacherSuggestions.classList.remove('show');
+        });
+    });
+});
+
+// Close suggestions when clicking outside
+document.addEventListener('click', (e) => {
+    if (!teacherNameInput.contains(e.target) && !teacherSuggestions.contains(e.target)) {
+        teacherSuggestions.classList.remove('show');
+    }
+});
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Check for URL parameters (from "Rate this teacher" button)
+function checkURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    const teacher = params.get('teacher');
+    const dept = params.get('dept');
+    
+    if (teacher && dept) {
+        teacherNameInput.value = decodeURIComponent(teacher);
+        departmentInput.value = decodeURIComponent(dept);
+        
+        // Scroll to form
+        setTimeout(() => {
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 500);
+    }
 }
 
 // Handle form submission
@@ -164,3 +321,18 @@ form.addEventListener('submit', async (e) => {
         submitBtn.textContent = 'Submit Rating';
     }
 });
+
+// Load existing ratings for autocomplete
+const ratingsRef = ref(database, 'teacher-ratings');
+onValue(ratingsRef, (snapshot) => {
+    const data = snapshot.val();
+    
+    if (data) {
+        allRatings = Object.values(data);
+        calculateTeacherStats();
+        displayQuickSelect();
+    }
+});
+
+// Check URL params on page load
+checkURLParams();
