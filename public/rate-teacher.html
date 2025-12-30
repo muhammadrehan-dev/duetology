@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Teacher - DUETology</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
+            <h1><a href="index.html">DUETology</a></h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="submit.html">Submit Confession</a>
+                <a href="view.html">View Confessions</a>
+                <a href="view-ratings.html">View Ratings</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>Rate a Teacher</h2>
+                <p>Share your honest review to help fellow students.</p>
+
+                <div class="form-notice">
+                    <p>⚠️ Please be respectful and constructive in your review. Personal attacks will be removed.</p>
+                </div>
+
+                <form id="ratingForm">
+                    <div class="form-group">
+                        <label for="teacherName">Teacher Name *</label>
+                        <input 
+                            type="text" 
+                            id="teacherName" 
+                            name="teacherName" 
+                            required 
+                            placeholder="e.g., Dr. Ahmed Khan"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="department">Department *</label>
+                        <select id="department" name="department" required>
+                            <option value="">-- Select Department --</option>
+                            <option value="Energy & Environment Engineering">Energy & Environment Engineering</option>
+                            <option value="Industrial Engineering & Management">Industrial Engineering & Management</option>
+                            <option value="Chemical Engineering">Chemical Engineering</option>
+                            <option value="Petroleum & Gas Engineering">Petroleum & Gas Engineering</option>
+                            <option value="Metallurgy & Materials Engineering">Metallurgy & Materials Engineering</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Cyber Security">Cyber Security</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                            <option value="Computer System Engineering">Computer System Engineering</option>
+                            <option value="Electronic Engineering">Electronic Engineering</option>
+                            <option value="Telecommunication Engineering">Telecommunication Engineering</option>
+                            <option value="Basic Sciences & Humanities">Basic Sciences & Humanities</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Architecture & Planning">Architecture & Planning</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rating *</label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" id="ratingValue" name="rating" required>
+                        <span class="rating-text" id="ratingText">Click to rate</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="review">Your Review *</label>
+                        <textarea 
+                            id="review" 
+                            name="review" 
+                            rows="8" 
+                            required 
+                            placeholder="Share your experience with this teacher... What did you like? What could be improved?"
+                            maxlength="1500"
+                        ></textarea>
+                        <span class="char-count"><span id="charCount">0</span>/1500</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Submit Rating
+                    </button>
+                </form>
+
+                <div id="message" class="message hidden"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 DUETology. All ratings are anonymous.</p>
+        </footer>
+    </div>
+
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/submit-rating.js"></script>
+    <script type="module" src="assets/js/analytics.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Ratings - DUETology</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
+            <h1><a href="index.html">DUETology</a></h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="submit.html">Submit Confession</a>
+                <a href="view.html">View Confessions</a>
+                <a href="rate-teacher.html">Rate Teachers</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="ratings-header">
+                <h2>Teacher Ratings</h2>
+                
+                <div class="filters">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="🔍 Search teacher name..."
+                        autocomplete="off"
+                    >
+                    
+                    <select id="departmentFilter" class="filter-select">
+                        <option value="all">All Departments</option>
+                        <option value="Energy & Environment Engineering">Energy & Environment</option>
+                        <option value="Industrial Engineering & Management">Industrial Engineering</option>
+                        <option value="Chemical Engineering">Chemical Engineering</option>
+                        <option value="Petroleum & Gas Engineering">Petroleum & Gas</option>
+                        <option value="Metallurgy & Materials Engineering">Metallurgy & Materials</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Cyber Security">Cyber Security</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        <option value="Computer System Engineering">Computer System</option>
+                        <option value="Electronic Engineering">Electronic Engineering</option>
+                        <option value="Telecommunication Engineering">Telecommunication</option>
+                        <option value="Basic Sciences & Humanities">Basic Sciences</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Architecture & Planning">Architecture & Planning</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                    </select>
+
+                    <select id="starsFilter" class="filter-select">
+                        <option value="all">All Ratings</option>
+                        <option value="5">5 Stars ⭐⭐⭐⭐⭐</option>
+                        <option value="4">4+ Stars ⭐⭐⭐⭐</option>
+                        <option value="3">3+ Stars ⭐⭐⭐</option>
+                        <option value="2">2+ Stars ⭐⭐</option>
+                        <option value="1">1+ Stars ⭐</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">Loading ratings...</div>
+            <div id="ratingsContainer" class="ratings-container"></div>
+            <div id="noRatings" class="no-ratings hidden">
+                No ratings found. Be the first to rate a teacher!
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 DUETology. All ratings are anonymous.</p>
+        </footer>
+    </div>
+
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/view-ratings.js"></script>
+    <script type="module" src="assets/js/analytics.js"></script>
+</body>
+</html>
