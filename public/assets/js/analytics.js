@@ -41,10 +41,11 @@ async function getVisitorInfo() {
         info.browser = 'Other';
     }
 
-    // Get IP and location info (using ipapi.co - free service)
+    // Get IP and location info - try multiple services
     try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
+        // Try ipapi.co first
+        let response = await fetch('https://ipapi.co/json/');
+        let data = await response.json();
         
         info.ip = data.ip;
         info.city = data.city;
@@ -55,10 +56,34 @@ async function getVisitorInfo() {
         info.isp = data.org;
         info.latitude = data.latitude;
         info.longitude = data.longitude;
-    } catch (error) {
-        console.log('Could not fetch IP info:', error);
-        info.ip = 'Unknown';
-        info.location = 'Unknown';
+    } catch (error1) {
+        try {
+            // Fallback to ip-api.com (more CORS friendly)
+            let response = await fetch('http://ip-api.com/json/');
+            let data = await response.json();
+            
+            info.ip = data.query;
+            info.city = data.city;
+            info.region = data.regionName;
+            info.country = data.country;
+            info.countryCode = data.countryCode;
+            info.timezone = data.timezone;
+            info.isp = data.isp;
+            info.latitude = data.lat;
+            info.longitude = data.lon;
+        } catch (error2) {
+            // If both fail, use basic info
+            console.log('Could not fetch IP info from any service');
+            info.ip = 'Not available';
+            info.city = 'Unknown';
+            info.region = 'Unknown';
+            info.country = 'Unknown';
+            info.countryCode = 'XX';
+            info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            info.isp = 'Unknown';
+            info.latitude = null;
+            info.longitude = null;
+        }
     }
 
     return info;
@@ -114,10 +139,14 @@ async function sendToTelegram(info) {
         });
 
         if (response.ok) {
-            console.log('Analytics sent to Telegram');
+            console.log('✅ Analytics sent to Telegram');
+        } else {
+            console.log('⚠️ Telegram response error:', response.status);
         }
     } catch (error) {
-        console.log('Failed to send analytics:', error);
+        console.log('⚠️ Telegram might be blocked in your region. Analytics saved to Firebase only.');
+        // This is normal in some countries where Telegram is blocked
+        // Analytics will still be saved to Firebase
     }
 }
 
@@ -132,21 +161,24 @@ async function saveToFirebase(info) {
             ...info,
             timestamp: Date.now()
         });
-        console.log('Analytics saved to Firebase');
+        console.log('✅ Analytics saved to Firebase');
     } catch (error) {
-        console.log('Failed to save analytics to Firebase:', error);
+        console.log('❌ Failed to save analytics to Firebase:', error);
     }
 }
 
 // Track page view
 async function trackPageView() {
+    console.log('🔍 Tracking page view...');
     const info = await getVisitorInfo();
     
-    // Send to Telegram
+    // Send to Telegram (may fail if blocked, that's okay)
     await sendToTelegram(info);
     
-    // Save to Firebase
+    // Save to Firebase (primary storage)
     await saveToFirebase(info);
+    
+    console.log('📊 Analytics tracking complete');
 }
 
 // Run analytics on page load
