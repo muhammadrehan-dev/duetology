@@ -9,12 +9,33 @@
 </head>
 <body>
     <div class="container">
-        <header>
+        <!-- Navbar -->
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-section">
             <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
-            <h1>DUETology</h1>
+            <h1 class="site-title">DUETology</h1>
+        </a>
+        
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            ☰ Menu
+        </button>
+        
+        <nav id="mainNav">
+            <a href="index.html">Home</a>
+            <a href="submit.html">Submit Confession</a>
+            <a href="view.html">View Confessions</a>
+            <a href="rate-teacher.html">Rate Teachers</a>
+            <a href="view-ratings.html">View Ratings</a>
+        </nav>
+    </div>
+</header>
+
+        <!-- Homepage Hero -->
+        <div class="homepage-header">
             <p class="tagline">Dawood University of Engineering & Technology</p>
             <p class="subtitle">Anonymous Confession & Teacher Rating Platform for DUET Students</p>
-        </header>
+        </div>
 
         <main>
             <div class="hero">
@@ -100,6 +121,18 @@
             </div>
         </footer>
     </div>
+    
+    <script>
+        // Mobile menu toggle
+        const toggle = document.getElementById('mobileMenuToggle');
+        const nav = document.getElementById('mainNav');
+        
+        toggle.addEventListener('click', () => {
+            nav.classList.toggle('show');
+            toggle.textContent = nav.classList.contains('show') ? '✕ Close' : '☰ Menu';
+        });
+    </script>
+    
     <script type="module" src="assets/js/analytics.js"></script>
 </body>
 </html>

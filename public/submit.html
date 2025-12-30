@@ -9,13 +9,26 @@
 </head>
 <body>
     <div class="container">
+        <!-- Navbar -->
         <header>
-            <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
-            <h1><a href="index.html">DUETology</a></h1>
-            <nav>
-                <a href="index.html">Home</a>
-                <a href="view.html">View Confessions</a>
-            </nav>
+            <div class="header-content">
+                <a href="index.html" class="logo-section">
+                    <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
+                    <h1 class="site-title">DUETology</h1>
+                </a>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    ☰ Menu
+                </button>
+                
+                <nav id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="submit.html" class="active">Submit Confession</a>
+                    <a href="view.html">View Confessions</a>
+                    <a href="rate-teacher.html">Rate Teachers</a>
+                    <a href="view-ratings.html">View Ratings</a>
+                </nav>
+            </div>
         </header>
 
         <main>
@@ -65,6 +78,17 @@
             <p>&copy; 2024 DUETology. All confessions are anonymous.</p>
         </footer>
     </div>
+
+    <script>
+        // Mobile menu toggle
+        const toggle = document.getElementById('mobileMenuToggle');
+        const nav = document.getElementById('mainNav');
+        
+        toggle.addEventListener('click', () => {
+            nav.classList.toggle('show');
+            toggle.textContent = nav.classList.contains('show') ? '✕ Close' : '☰ Menu';
+        });
+    </script>
 
     <script type="module" src="assets/js/firebase-config.js"></script>
     <script type="module" src="assets/js/submit-confession.js"></script>
