@@ -1,6 +1,6 @@
 // Telegram Bot Configuration
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN'; // Get from @BotFather
-const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Your Telegram chat ID
+const TELEGRAM_BOT_TOKEN = '8578662221:AAH_O5I0ebg_yLWjj-PgDJOJV7-ViEqm42k';
+const TELEGRAM_CHAT_ID = '8488968721';
 
 // Get visitor information
 async function getVisitorInfo() {
