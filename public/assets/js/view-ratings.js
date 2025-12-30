@@ -95,7 +95,7 @@ function createStarDisplay(rating, averageRating = null) {
     return stars;
 }
 
-// Create teacher card with all ratings
+// Create teacher card with all ratings and quick rate button
 function createTeacherCard(teacherKey) {
     const stats = teacherStats[teacherKey];
     const averageRating = (stats.totalStars / stats.totalRatings).toFixed(1);
@@ -141,6 +141,9 @@ function createTeacherCard(teacherKey) {
                 <div class="average-rating">${averageRating}</div>
                 <div class="stars-display">${createStarDisplay(null, parseFloat(averageRating))}</div>
                 <div class="rating-count">${stats.totalRatings} review${stats.totalRatings > 1 ? 's' : ''}</div>
+                <a href="rate-teacher.html?teacher=${encodeURIComponent(stats.teacherName)}&dept=${encodeURIComponent(stats.department)}" class="btn btn-primary" style="margin-top: 12px; padding: 8px 16px; font-size: 0.9rem; text-decoration: none;">
+                    ⭐ Rate This Teacher
+                </a>
             </div>
         </div>
         <div class="ratings-list">
