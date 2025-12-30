@@ -1,7 +1,3 @@
-// Telegram Bot Configuration
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-
 // Get visitor information
 async function getVisitorInfo() {
     const info = {
@@ -141,62 +137,6 @@ async function getVisitorInfo() {
     return info;
 }
 
-// Format message for Telegram
-function formatTelegramMessage(info) {
-    return `
-🔔 <b>New Visitor on DUETology</b>
-
-📱 <b>Device Info:</b>
-• Type: ${info.deviceType}
-• Browser: ${info.browser}
-• Platform: ${info.platform}
-• Screen: ${info.screenResolution}
-
-🌐 <b>Location:</b>
-• IP: <code>${info.ip}</code>
-• City: ${info.city || 'N/A'}
-• Region: ${info.region || 'N/A'}
-• Country: ${info.country || 'N/A'} (${info.countryCode || 'N/A'})
-• ISP: ${info.isp || 'N/A'}
-• Timezone: ${info.timezone || 'N/A'}
-
-📄 <b>Page Info:</b>
-• Page: ${info.pageTitle}
-• URL: ${info.page}
-• Referrer: ${info.referrer}
-
-⏰ <b>Time:</b> ${info.timestamp}
-
-🔗 <b>User Agent:</b>
-<code>${info.userAgent}</code>
-    `.trim();
-}
-
-// Send to Telegram with timeout
-async function sendToTelegram(info) {
-    const message = formatTelegramMessage(info);
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            }),
-            signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
-
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
-}
-
 // Save to Firebase Analytics
 import { database } from './firebase-config.js';
 import { ref, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -219,11 +159,6 @@ async function trackPageView() {
     try {
         const info = await getVisitorInfo();
         
-        // Try to send to Telegram (don't wait for it, it might timeout)
-        sendToTelegram(info).catch(() => {
-            // Silently fail if Telegram is blocked
-        });
-        
         // Save to Firebase (primary storage - wait for this)
         await saveToFirebase(info);
     } catch (error) {
@@ -232,12 +167,9 @@ async function trackPageView() {
 }
 
 // Run analytics on page load
-if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-    // Use setTimeout to avoid blocking page load
-    setTimeout(() => {
-        trackPageView();
-    }, 100);
-}
+setTimeout(() => {
+    trackPageView();
+}, 100);
 
 // Track time spent on page
 let startTime = Date.now();
