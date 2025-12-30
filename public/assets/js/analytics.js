@@ -41,49 +41,101 @@ async function getVisitorInfo() {
         info.browser = 'Other';
     }
 
-    // Get IP and location info - try multiple services
+    // Get basic timezone info (always works)
+    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // Try to get IP info from multiple CORS-friendly services
+    let ipInfoFetched = false;
+    
+    // Service 1: ipify.org for IP only (very reliable, CORS-friendly)
     try {
-        // Try ipapi.co first
-        let response = await fetch('https://ipapi.co/json/');
-        let data = await response.json();
-        
-        info.ip = data.ip;
-        info.city = data.city;
-        info.region = data.region;
-        info.country = data.country_name;
-        info.countryCode = data.country_code;
-        info.timezone = data.timezone;
-        info.isp = data.org;
-        info.latitude = data.latitude;
-        info.longitude = data.longitude;
-    } catch (error1) {
+        const ipResponse = await fetch('https://api.ipify.org?format=json', {
+            signal: AbortSignal.timeout(3000)
+        });
+        const ipData = await ipResponse.json();
+        info.ip = ipData.ip;
+        ipInfoFetched = true;
+    } catch (error) {
+        console.log('ipify.org failed, trying next service...');
+    }
+
+    // Service 2: Try ipapi.co (if not blocked)
+    if (!ipInfoFetched) {
         try {
-            // Fallback to ip-api.com (more CORS friendly)
-            let response = await fetch('http://ip-api.com/json/');
-            let data = await response.json();
+            const response = await fetch('https://ipapi.co/json/', {
+                signal: AbortSignal.timeout(3000)
+            });
+            const data = await response.json();
+            
+            info.ip = data.ip;
+            info.city = data.city;
+            info.region = data.region;
+            info.country = data.country_name;
+            info.countryCode = data.country_code;
+            info.isp = data.org;
+            info.latitude = data.latitude;
+            info.longitude = data.longitude;
+            ipInfoFetched = true;
+        } catch (error) {
+            console.log('ipapi.co failed, trying next service...');
+        }
+    }
+
+    // Service 3: Try ip-api.com via HTTPS (if not blocked)
+    if (!ipInfoFetched) {
+        try {
+            const response = await fetch('https://ip-api.com/json/', {
+                signal: AbortSignal.timeout(3000)
+            });
+            const data = await response.json();
             
             info.ip = data.query;
             info.city = data.city;
             info.region = data.regionName;
             info.country = data.country;
             info.countryCode = data.countryCode;
-            info.timezone = data.timezone;
             info.isp = data.isp;
             info.latitude = data.lat;
             info.longitude = data.lon;
-        } catch (error2) {
-            // If both fail, use basic info
-            console.log('Could not fetch IP info from any service');
-            info.ip = 'Not available';
-            info.city = 'Unknown';
-            info.region = 'Unknown';
-            info.country = 'Unknown';
-            info.countryCode = 'XX';
-            info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            info.isp = 'Unknown';
-            info.latitude = null;
-            info.longitude = null;
+            ipInfoFetched = true;
+        } catch (error) {
+            console.log('ip-api.com failed, trying next service...');
         }
+    }
+
+    // Service 4: Cloudflare trace (very reliable)
+    if (!ipInfoFetched) {
+        try {
+            const response = await fetch('https://1.1.1.1/cdn-cgi/trace', {
+                signal: AbortSignal.timeout(3000)
+            });
+            const text = await response.text();
+            const lines = text.split('\n');
+            const traceData = {};
+            lines.forEach(line => {
+                const [key, value] = line.split('=');
+                if (key && value) traceData[key] = value;
+            });
+            
+            info.ip = traceData.ip || 'Unknown';
+            info.country = traceData.loc || 'Unknown';
+            info.countryCode = traceData.loc || 'XX';
+            ipInfoFetched = true;
+        } catch (error) {
+            console.log('Cloudflare trace failed');
+        }
+    }
+
+    // If all services fail, use defaults
+    if (!ipInfoFetched || !info.ip) {
+        info.ip = 'Not available';
+        info.city = 'Unknown';
+        info.region = 'Unknown';
+        info.country = 'Unknown';
+        info.countryCode = 'XX';
+        info.isp = 'Unknown';
+        info.latitude = null;
+        info.longitude = null;
     }
 
     return info;
@@ -120,7 +172,7 @@ function formatTelegramMessage(info) {
     `.trim();
 }
 
-// Send to Telegram
+// Send to Telegram with timeout
 async function sendToTelegram(info) {
     const message = formatTelegramMessage(info);
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -135,18 +187,24 @@ async function sendToTelegram(info) {
                 chat_id: TELEGRAM_CHAT_ID,
                 text: message,
                 parse_mode: 'HTML'
-            })
+            }),
+            signal: AbortSignal.timeout(5000) // 5 second timeout
         });
 
         if (response.ok) {
             console.log('✅ Analytics sent to Telegram');
+            return true;
         } else {
             console.log('⚠️ Telegram response error:', response.status);
+            return false;
         }
     } catch (error) {
-        console.log('⚠️ Telegram might be blocked in your region. Analytics saved to Firebase only.');
-        // This is normal in some countries where Telegram is blocked
-        // Analytics will still be saved to Firebase
+        if (error.name === 'TimeoutError') {
+            console.log('⚠️ Telegram request timed out (may be blocked in your region)');
+        } else {
+            console.log('⚠️ Could not reach Telegram:', error.message);
+        }
+        return false;
     }
 }
 
@@ -162,36 +220,64 @@ async function saveToFirebase(info) {
             timestamp: Date.now()
         });
         console.log('✅ Analytics saved to Firebase');
+        return true;
     } catch (error) {
         console.log('❌ Failed to save analytics to Firebase:', error);
+        return false;
     }
 }
 
 // Track page view
 async function trackPageView() {
     console.log('🔍 Tracking page view...');
-    const info = await getVisitorInfo();
     
-    // Send to Telegram (may fail if blocked, that's okay)
-    await sendToTelegram(info);
-    
-    // Save to Firebase (primary storage)
-    await saveToFirebase(info);
-    
-    console.log('📊 Analytics tracking complete');
+    try {
+        const info = await getVisitorInfo();
+        
+        // Try to send to Telegram (don't wait for it, it might timeout)
+        sendToTelegram(info).catch(() => {
+            // Silently fail if Telegram is blocked
+        });
+        
+        // Save to Firebase (primary storage - wait for this)
+        const firebaseSuccess = await saveToFirebase(info);
+        
+        if (firebaseSuccess) {
+            console.log('📊 Analytics tracking complete');
+        } else {
+            console.log('⚠️ Analytics tracking had issues');
+        }
+    } catch (error) {
+        console.log('❌ Analytics tracking failed:', error);
+    }
 }
 
 // Run analytics on page load
 if (TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN' && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID') {
-    trackPageView();
+    // Use setTimeout to avoid blocking page load
+    setTimeout(() => {
+        trackPageView();
+    }, 100);
 } else {
     console.log('⚠️ Please configure Telegram bot credentials in analytics.js');
 }
 
 // Track time spent on page
 let startTime = Date.now();
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', async () => {
     const timeSpent = Math.round((Date.now() - startTime) / 1000);
-    // You can send this to Firebase if needed
+    
+    // Try to save time spent to Firebase using sendBeacon for reliability
+    try {
+        const analyticsRef = ref(database, 'time-spent');
+        await push(analyticsRef, {
+            page: window.location.pathname,
+            timeSpent: timeSpent,
+            timestamp: Date.now()
+        });
+    } catch (error) {
+        console.log('Could not save time spent data');
+    }
+    
     console.log(`Time spent: ${timeSpent} seconds`);
 });
