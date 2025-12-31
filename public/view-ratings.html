@@ -6,8 +6,19 @@
     <title>Teacher Ratings - DUETology</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M29L3HPV');</script>
+<!-- End Google Tag Manager -->
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M29L3HPV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <div class="container">
 <header>
     <div class="header-content">
@@ -89,5 +100,38 @@
     <script type="module" src="assets/js/firebase-config.js"></script>
     <script type="module" src="assets/js/view-ratings.js"></script>
     <script type="module" src="assets/js/analytics.js"></script>
+        <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('mobileMenuToggle');
+    const nav = document.getElementById('mainNav');
+    
+    if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+            nav.classList.toggle('show');
+            toggle.textContent = nav.classList.contains('show') ? '✕ Close' : '☰ Menu';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideNav = nav.contains(event.target);
+            const isClickOnToggle = toggle.contains(event.target);
+            
+            if (!isClickInsideNav && !isClickOnToggle && nav.classList.contains('show')) {
+                nav.classList.remove('show');
+                toggle.textContent = '☰ Menu';
+            }
+        });
+
+        // Close menu when clicking on a nav link
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                nav.classList.remove('show');
+                toggle.textContent = '☰ Menu';
+            });
+        });
+    }
+});</script>
 </body>
 </html>

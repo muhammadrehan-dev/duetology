@@ -6,30 +6,41 @@
     <title>Submit Confession - DUETology</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M29L3HPV');</script>
+<!-- End Google Tag Manager -->
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M29L3HPV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <div class="container">
         <!-- Navbar -->
-        <header>
-            <div class="header-content">
-                <a href="index.html" class="logo-section">
-                    <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
-                    <h1 class="site-title">DUETology</h1>
-                </a>
-                
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    ☰ Menu
-                </button>
-                
-                <nav id="mainNav">
-                    <a href="index.html">Home</a>
-                    <a href="submit.html" class="active">Submit Confession</a>
-                    <a href="view.html">View Confessions</a>
-                    <a href="rate-teacher.html">Rate Teachers</a>
-                    <a href="view-ratings.html">View Ratings</a>
-                </nav>
-            </div>
-        </header>
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-section">
+            <img src="assets/images/logo.png" alt="DUET Logo" class="logo">
+            <h1 class="site-title">DUETology</h1>
+        </a>
+        
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            ☰ Menu
+        </button>
+        
+        <nav id="mainNav">
+            <a href="index.html">Home</a>
+            <a href="submit.html">Submit Confession</a>
+            <a href="view.html">View Confessions</a>
+            <a href="rate-teacher.html">Rate Teachers</a>
+            <a href="view-ratings.html">View Ratings</a>
+        </nav>
+    </div>
+</header>
 
         <main>
             <div class="form-container">
@@ -93,5 +104,39 @@
     <script type="module" src="assets/js/firebase-config.js"></script>
     <script type="module" src="assets/js/submit-confession.js"></script>
     <script type="module" src="assets/js/analytics.js"></script>
+        <script>// Mobile menu toggle script - Add this to all HTML pages
+// Place this script before the closing </body> tag
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('mobileMenuToggle');
+    const nav = document.getElementById('mainNav');
+    
+    if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+            nav.classList.toggle('show');
+            toggle.textContent = nav.classList.contains('show') ? '✕ Close' : '☰ Menu';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideNav = nav.contains(event.target);
+            const isClickOnToggle = toggle.contains(event.target);
+            
+            if (!isClickInsideNav && !isClickOnToggle && nav.classList.contains('show')) {
+                nav.classList.remove('show');
+                toggle.textContent = '☰ Menu';
+            }
+        });
+
+        // Close menu when clicking on a nav link
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                nav.classList.remove('show');
+                toggle.textContent = '☰ Menu';
+            });
+        });
+    }
+});</script>
 </body>
 </html>
