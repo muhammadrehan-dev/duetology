@@ -1,0 +1,40 @@
+# robots.txt for DUETology
+# https://duetology.vercel.app/robots.txt
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow admin or private directories (if any)
+Disallow: /assets/js/firebase-config.js
+Disallow: /admin/
+Disallow: /*.json$
+
+# Crawl-delay (optional, adjust if needed)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://duetology.vercel.app/sitemap.xml
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
