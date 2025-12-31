@@ -13,8 +13,9 @@ Disallow: /*.json$
 # Crawl-delay (optional, adjust if needed)
 Crawl-delay: 1
 
-# Sitemap location
+# Sitemap locations (provide both paths for compatibility)
 Sitemap: https://duetology.vercel.app/sitemap.xml
+Sitemap: https://duetology.vercel.app/Sitemaps/sitemap.xml
 
 # Specific bot rules
 User-agent: Googlebot
